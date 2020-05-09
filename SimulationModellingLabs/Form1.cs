@@ -41,6 +41,7 @@ namespace SimulationModellingLabs
             }
 
             var sum = eventsProb.Take(4).Sum();
+
             if (sum < 1)
             {
                 eventsProb[4] = 1 - sum;
