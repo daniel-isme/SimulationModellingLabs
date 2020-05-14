@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -47,28 +47,32 @@
             this.generateButton = new System.Windows.Forms.Button();
             this.errorLabel = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.averageLabel = new System.Windows.Forms.Label();
+            this.varianceLabel = new System.Windows.Forms.Label();
+            this.chiSquaredLabel = new System.Windows.Forms.Label();
+            this.chiSquaredLogicLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // chart1
             // 
-            chartArea2.AxisX.IsStartedFromZero = false;
-            chartArea2.AxisX.MajorGrid.Enabled = false;
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea6.AxisX.IsStartedFromZero = false;
+            chartArea6.AxisX.MajorGrid.Enabled = false;
+            chartArea6.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea6);
             this.chart1.Location = new System.Drawing.Point(337, 31);
             this.chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.IsValueShownAsLabel = true;
-            series2.Name = "Series1";
-            this.chart1.Series.Add(series2);
-            this.chart1.Size = new System.Drawing.Size(437, 374);
+            series6.ChartArea = "ChartArea1";
+            series6.IsValueShownAsLabel = true;
+            series6.Name = "Series1";
+            this.chart1.Series.Add(series6);
+            this.chart1.Size = new System.Drawing.Size(437, 291);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
-            title2.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
-            title2.Name = "Title1";
-            title2.Text = "freq.";
-            this.chart1.Titles.Add(title2);
+            title6.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
+            title6.Name = "Title1";
+            title6.Text = "freq.";
+            this.chart1.Titles.Add(title6);
             // 
             // label1
             // 
@@ -137,7 +141,7 @@
             this.prob1TextBox.Name = "prob1TextBox";
             this.prob1TextBox.Size = new System.Drawing.Size(81, 27);
             this.prob1TextBox.TabIndex = 7;
-            this.prob1TextBox.Text = "0.18536";
+            this.prob1TextBox.Text = "0.264";
             this.prob1TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // prob2TextBox
@@ -147,7 +151,7 @@
             this.prob2TextBox.Name = "prob2TextBox";
             this.prob2TextBox.Size = new System.Drawing.Size(81, 27);
             this.prob2TextBox.TabIndex = 8;
-            this.prob2TextBox.Text = "0.25852";
+            this.prob2TextBox.Text = "0.128";
             this.prob2TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // prob3TextBox
@@ -157,7 +161,7 @@
             this.prob3TextBox.Name = "prob3TextBox";
             this.prob3TextBox.Size = new System.Drawing.Size(81, 27);
             this.prob3TextBox.TabIndex = 9;
-            this.prob3TextBox.Text = "0.156432";
+            this.prob3TextBox.Text = "0.228";
             this.prob3TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // prob4TextBox
@@ -167,7 +171,7 @@
             this.prob4TextBox.Name = "prob4TextBox";
             this.prob4TextBox.Size = new System.Drawing.Size(81, 27);
             this.prob4TextBox.TabIndex = 10;
-            this.prob4TextBox.Text = "0.28765";
+            this.prob4TextBox.Text = "0.207";
             this.prob4TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // prob5TextBox
@@ -193,12 +197,15 @@
             // 
             // generateButton
             // 
+            this.generateButton.BackColor = System.Drawing.Color.DodgerBlue;
+            this.generateButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateButton.ForeColor = System.Drawing.Color.White;
             this.generateButton.Location = new System.Drawing.Point(87, 321);
             this.generateButton.Name = "generateButton";
-            this.generateButton.Size = new System.Drawing.Size(138, 42);
+            this.generateButton.Size = new System.Drawing.Size(100, 42);
             this.generateButton.TabIndex = 13;
-            this.generateButton.Text = "GENERATE";
-            this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Text = "Start";
+            this.generateButton.UseVisualStyleBackColor = false;
             this.generateButton.Click += new System.EventHandler(this.generateButton_Click);
             // 
             // errorLabel
@@ -221,12 +228,55 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // averageLabel
+            // 
+            this.averageLabel.AutoSize = true;
+            this.averageLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.averageLabel.Location = new System.Drawing.Point(332, 338);
+            this.averageLabel.Name = "averageLabel";
+            this.averageLabel.Size = new System.Drawing.Size(92, 25);
+            this.averageLabel.TabIndex = 16;
+            this.averageLabel.Text = "Average:";
+            // 
+            // varianceLabel
+            // 
+            this.varianceLabel.AutoSize = true;
+            this.varianceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.varianceLabel.Location = new System.Drawing.Point(332, 363);
+            this.varianceLabel.Name = "varianceLabel";
+            this.varianceLabel.Size = new System.Drawing.Size(96, 25);
+            this.varianceLabel.TabIndex = 17;
+            this.varianceLabel.Text = "Variance:";
+            // 
+            // chiSquaredLabel
+            // 
+            this.chiSquaredLabel.AutoSize = true;
+            this.chiSquaredLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chiSquaredLabel.Location = new System.Drawing.Point(332, 402);
+            this.chiSquaredLabel.Name = "chiSquaredLabel";
+            this.chiSquaredLabel.Size = new System.Drawing.Size(126, 25);
+            this.chiSquaredLabel.TabIndex = 18;
+            this.chiSquaredLabel.Text = "Chi-squared:";
+            // 
+            // chiSquaredLogicLabel
+            // 
+            this.chiSquaredLogicLabel.AutoSize = true;
+            this.chiSquaredLogicLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chiSquaredLogicLabel.Location = new System.Drawing.Point(647, 402);
+            this.chiSquaredLogicLabel.Name = "chiSquaredLogicLabel";
+            this.chiSquaredLogicLabel.Size = new System.Drawing.Size(0, 25);
+            this.chiSquaredLogicLabel.TabIndex = 19;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chiSquaredLogicLabel);
+            this.Controls.Add(this.chiSquaredLabel);
+            this.Controls.Add(this.varianceLabel);
+            this.Controls.Add(this.averageLabel);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.errorLabel);
             this.Controls.Add(this.generateButton);
@@ -269,6 +319,10 @@
         private System.Windows.Forms.Button generateButton;
         private System.Windows.Forms.Label errorLabel;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label averageLabel;
+        private System.Windows.Forms.Label varianceLabel;
+        private System.Windows.Forms.Label chiSquaredLabel;
+        private System.Windows.Forms.Label chiSquaredLogicLabel;
     }
 }
 
