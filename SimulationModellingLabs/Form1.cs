@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Activities.Statements;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,11 +79,11 @@ namespace SimulationModellingLabs
             errorLabel.Text = "";
             try
             {
-                eventsProb[0] = double.Parse(probTextBox1.Text);
-                eventsProb[1] = double.Parse(probTextBox2.Text);
-                eventsProb[2] = double.Parse(probTextBox3.Text);
-                eventsProb[3] = double.Parse(probTextBox4.Text);
-                eventsProb[4] = double.Parse(probTextBox5.Text);
+                eventsProb[0] = GetDouble(probTextBox1.Text, 0.166666);
+                eventsProb[1] = GetDouble(probTextBox2.Text, 0.166666);
+                eventsProb[2] = GetDouble(probTextBox3.Text, 0.166666);
+                eventsProb[3] = GetDouble(probTextBox4.Text, 0.166666);
+                eventsProb[4] = GetDouble(probTextBox5.Text, 0.166666);
             }
             catch
             {
@@ -99,6 +101,24 @@ namespace SimulationModellingLabs
                 errorLabel.Text = "Error: Sum of probs > 1";
                 return;
             }
+        }
+
+        public static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+                throw new Exception("Failed to parse from string");
+            }
+
+            return result;
         }
 
         private int generateEvent(double alpha)

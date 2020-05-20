@@ -384,7 +384,7 @@
             // 
             // rollAnywayButton
             // 
-            this.rollAnywayButton.Location = new System.Drawing.Point(33, 348);
+            this.rollAnywayButton.Location = new System.Drawing.Point(32, 327);
             this.rollAnywayButton.Name = "rollAnywayButton";
             this.rollAnywayButton.Size = new System.Drawing.Size(108, 39);
             this.rollAnywayButton.TabIndex = 32;
