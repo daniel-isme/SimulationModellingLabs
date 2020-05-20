@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,10 +57,10 @@ namespace SimulationModellingLabs
             errorLabel.Text = "";
             try
             {
-                events.First(ev => ev.x == 1).p = double.Parse(prob1TextBox.Text);
-                events.First(ev => ev.x == 2).p = double.Parse(prob2TextBox.Text);
-                events.First(ev => ev.x == 3).p = double.Parse(prob3TextBox.Text);
-                events.First(ev => ev.x == 4).p = double.Parse(prob4TextBox.Text);
+                events.First(ev => ev.x == 1).p = GetDouble(prob1TextBox.Text, 0.16666);
+                events.First(ev => ev.x == 2).p = GetDouble(prob2TextBox.Text, 0.16666);
+                events.First(ev => ev.x == 3).p = GetDouble(prob3TextBox.Text, 0.16666);
+                events.First(ev => ev.x == 4).p = GetDouble(prob4TextBox.Text, 0.16666);
                 N = int.Parse(numOfExperimentsTextBox.Text);
             }
             catch
@@ -132,6 +133,24 @@ namespace SimulationModellingLabs
             {
                 chiSquaredLogicLabel.ForeColor = Color.Red;
             }
+        }
+
+        public static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+                throw new Exception("Failed to parse from string");
+            }
+
+            return result;
         }
 
         private int generateEvent(double alpha, double[] eventsProb)
