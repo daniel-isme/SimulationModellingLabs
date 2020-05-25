@@ -30,7 +30,6 @@
         {
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label6 = new System.Windows.Forms.Label();
@@ -44,7 +43,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.range_textBox = new System.Windows.Forms.TextBox();
-            this.intensity_textBox = new System.Windows.Forms.TextBox();
+            this.Dx_textBox = new System.Windows.Forms.TextBox();
+            this.Ex_textBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -57,14 +58,9 @@
             this.chart1.Location = new System.Drawing.Point(337, 31);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.IsValueShownAsLabel = true;
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series1.Name = "Series1";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Name = "Series2";
             this.chart1.Series.Add(series1);
-            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(437, 291);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -161,9 +157,9 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(14, 154);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(84, 25);
+            this.label1.Size = new System.Drawing.Size(90, 25);
             this.label1.TabIndex = 20;
-            this.label1.Text = "Intensity";
+            this.label1.Text = "Variance";
             // 
             // label2
             // 
@@ -185,15 +181,35 @@
             this.range_textBox.Text = "10";
             this.range_textBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // intensity_textBox
+            // Dx_textBox
             // 
-            this.intensity_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.intensity_textBox.Location = new System.Drawing.Point(242, 152);
-            this.intensity_textBox.Name = "intensity_textBox";
-            this.intensity_textBox.Size = new System.Drawing.Size(75, 27);
-            this.intensity_textBox.TabIndex = 23;
-            this.intensity_textBox.Text = "5";
-            this.intensity_textBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Dx_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Dx_textBox.Location = new System.Drawing.Point(242, 152);
+            this.Dx_textBox.Name = "Dx_textBox";
+            this.Dx_textBox.Size = new System.Drawing.Size(75, 27);
+            this.Dx_textBox.TabIndex = 23;
+            this.Dx_textBox.Text = "1";
+            this.Dx_textBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // Ex_textBox
+            // 
+            this.Ex_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Ex_textBox.Location = new System.Drawing.Point(242, 102);
+            this.Ex_textBox.Name = "Ex_textBox";
+            this.Ex_textBox.Size = new System.Drawing.Size(75, 27);
+            this.Ex_textBox.TabIndex = 24;
+            this.Ex_textBox.Text = "0";
+            this.Ex_textBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(14, 104);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(86, 25);
+            this.label3.TabIndex = 25;
+            this.label3.Text = "Average";
             // 
             // Form1
             // 
@@ -201,7 +217,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.intensity_textBox);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.Ex_textBox);
+            this.Controls.Add(this.Dx_textBox);
             this.Controls.Add(this.range_textBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -236,7 +254,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox range_textBox;
-        private System.Windows.Forms.TextBox intensity_textBox;
+        private System.Windows.Forms.TextBox Dx_textBox;
+        private System.Windows.Forms.TextBox Ex_textBox;
+        private System.Windows.Forms.Label label3;
     }
 }
 
