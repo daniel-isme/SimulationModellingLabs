@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimulationModellingLabs.Properties
+namespace CurrencySimulation.Properties
 {
 
 
