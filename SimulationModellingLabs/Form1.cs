@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,93 +15,122 @@ namespace SimulationModellingLabs
     public partial class Form1 : Form
     {
 
-        Random rnd = new Random();
-
-        int N = 0; // общее число экспериментов
-        int range = 0;
-        double Ex; // матожидание
-        double Dx; // дисперсия
-        List<double> X;
-        List<double> Y;
-
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void generateButton_Click(object sender, EventArgs e)
+        Random rnd = new Random();
+
+        double[] finalProbs = new double[] { 56.0 / 240.0, 124.0 / 240.0, 60.0 / 240.0 };
+        int weatherState = 0;
+        double N = 0;
+
+        int time = 0;
+        int changeTime = 2;
+        bool paused = true;
+        double[,] matrix = new double[,] { 
+            { -0.4,  0.3,  0.1 },
+            { 0.4, -0.8,  0.4 },
+            { 0.1,  0.4, -0.5 } 
+        };
+
+        //0 - clear, 1 - cloudy, 2 - rain
+        double[] weatherProbabilities = new double[] { 0, 0, 0 };
+
+        private void startButton_Click(object sender, EventArgs e)
         {
-            cleanUpParameters();
+            if (!paused) return;
 
-            chart1.Series["Series1"].Points.Clear();
-            errorLabel.Text = "";
-            try
-            {
-                range = (int)GetDouble(range_textBox.Text);
-                N = (int)GetDouble(numOfExperimentsTextBox.Text);
-                Ex = GetDouble(Ex_textBox.Text);
-                Dx = GetDouble(Dx_textBox.Text);
-            }
-            catch
-            {
-                errorLabel.Text = "Error: Enter valid numbers";
-                return;
-            }
-
-            generateEvents();
-
-            for (int i = 0; i < X.Count; i++)
-            {
-                chart1.Series["Series1"].Points.AddXY(X[i], Y[i]);
-            }
+            paused = false;
         }
 
-        public int Factorial(int f)
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            if (f == 0)
-                return 1;
-            else
-                return f * Factorial(f - 1);
-        }
-
-        private void generateEvents()
-        {
-            for (int i = 0; i < N; i++)
+            if (!paused)
             {
-                var rand = (rnd.NextDouble() - 0.5) * range;
-                var e = (1 / (Math.Sqrt(2 * Math.PI))) * Math.Pow(Math.E, (-rand * rand) / 2);
-                e = Ex + Dx * e;
-                Y.Add(e);
-                X.Add(rand);
+                updateTime();
+
+                if (time > changeTime)
+                {
+                    increaseChangeTime();
+                    updateState();
+                    updatePicture();
+                    updateProbs();
+                    updateChart();
+                }
             }
         }
 
-        private void cleanUpParameters()
+        private void updateChart()
         {
-            N = 0;
-            range = 0;
-            Ex = 0;
-            Dx = 0;
-            X = new List<double>();
-            Y = new List<double>();
-        }
+            chart1.Series["Probability"].Points.Clear();
+            chart1.Series["Final"].Points.Clear();
 
-        public static double GetDouble(string value)
-        {
-            double result;
-
-            //Try parsing in the current culture
-            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
-                //Then try in US english
-                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
-                //Then in neutral language
-                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            for (int i = 0; i < weatherProbabilities.Count(); i++)
             {
-                throw new Exception("Failed to parse from string");
+                chart1.Series["Probability"].Points.AddXY(i + 1, weatherProbabilities[i] / N);
+                chart1.Series["Final"].Points.AddXY(i + 1, finalProbs[i]);
             }
-
-            return result;
         }
 
+        private void updateProbs()
+        {
+            weatherProbabilities[weatherState]++;
+            N++;
+        }
+
+        private void updatePicture()
+        {
+            switch (weatherState)
+            {
+                case 0:
+                    weatherPictureBox.Image = Properties.Resources.clear;
+                    break;
+                case 1:
+                    weatherPictureBox.Image = Properties.Resources.cloudy;
+                    break;
+                case 2:
+                    weatherPictureBox.Image = Properties.Resources.rain;
+                    break;
+            }
+        }
+
+        private void updateState()
+        {
+            var r = rnd.NextDouble();
+            double acc = 0;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (i != weatherState)
+                {
+                    var v = -matrix[weatherState, i] / matrix[weatherState, weatherState];
+                    acc += v;
+                    if (acc > r)
+                    {
+                        weatherState = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void increaseChangeTime()
+        {
+            var t = Math.Log(rnd.NextDouble()) / matrix[weatherState, weatherState];
+            changeTime += (int)Math.Ceiling(t);
+        }
+
+        private void updateTime()
+        {
+            time++;
+            timeLabel.Text = $"{time % 24}:00";
+        }
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            paused = true;
+        }
     }
 }
