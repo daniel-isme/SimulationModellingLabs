@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace SimulationModellingLabs
@@ -9,162 +10,179 @@ namespace SimulationModellingLabs
         public Form1()
         {
             InitializeComponent();
+            labels.Add(agent0Label);
+            labels.Add(agent1Label);
+            labels.Add(agent2Label);
+            labels.Add(agent3Label);
+            labels.Add(agent4Label);
+
+            var p = new ProducerAgent(0);
+            p.workTime = Math.Ceiling(getExponentialRandomVariable(PRODUCTION_DELAY));
+
+            for (int i = 1; i <= CONSUMERS_NUM; i++)
+            {
+                var c = new ConsumerAgent(i);
+                agents.Add(c);
+            }
+
+            consumersNumLabel.Text = $"Consumers: {CONSUMERS_NUM}";
+
         }
 
-        public static double factorial(int num)
-        {
-            var rval = 1;
-            for (var i = 2; i <= num; i++)
-                rval = rval * i;
-            return rval;
-        }
+        List<Label> labels = new List<Label>();
 
         public static Random random = new Random();
 
-        public static int T;
-        public static int N;
-        public static int MAX;
+        public static double ERV_COEF = 30;
+        public static double T = 0;
+        public static int CONSUMERS_NUM = (int)Math.Ceiling(random.NextDouble() * 5) + 1;
+        public static double WORK_DELAY = 1;
+        public static double PRODUCTION_DELAY = WORK_DELAY * (CONSUMERS_NUM - 1.9);
 
-        public class RandomFlow
+        public static int queue = 0;
+        public static List<ConsumerAgent> agents = new List<ConsumerAgent>();
+
+        public static double getExponentialRandomVariable(double lambda)
         {
-            public int rate;
-            public double[] events;
-            public RandomFlow(int rate)
+            double res = lambda * Math.Pow(Math.E, -lambda * random.NextDouble());
+            return res * ERV_COEF;
+        }
+
+        public class Agent
+        {
+            public Agent(int idd)
             {
-                this.rate = rate;
-                events = new double[MAX];
-                for (int i = 0; i < MAX; i++)
-                { 
-                    events[i] = 0; 
-                }
+                id = idd;
+                workTime = 0;
+                hasWork = true;
             }
 
-            public void start()
+            public double getNextEvent()
             {
-                for (int i = 0; i < N; i++)
-                {
-                    int n = getNumberOfEvents(rate);
-                    try
-                    {
-                        events[n] += 1;
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
-
-                for (int i = 0; i < MAX; i++)
-                {
-                    events[i] /= N;
-                }
+                throw new Exception("Must be implemented");
             }
 
-            public int getNumberOfEvents(int rate)
+            public void processEvent()
             {
-                int i = 0;
-                double acc = 0;
-                double P = random.NextDouble();
-                while (true)
+                throw new Exception("Must be implemented");
+            }
+
+            public string getStatus()
+            {
+                return "Not implemented";
+            }
+
+            public int id;
+            public double workTime;
+            public bool hasWork;
+        }
+
+        public class ProducerAgent : Agent
+        {
+            public ProducerAgent(int id) : base(id) { }
+
+            public double getNextEvent()
+            {
+                return workTime;
+            }
+
+            public void processEvent()
+            {
+                workTime = Math.Ceiling(getExponentialRandomVariable(PRODUCTION_DELAY));
+
+                foreach (var a in agents)
                 {
-                    double prob = (Math.Pow(rate * T, i) / factorial(i)) * Math.Pow(Math.E, -rate * T);
-                    acc += prob;
-                    if (P < acc)
+                    if (!a.hasWork)
                     {
-                        return i;
+                        a.hasWork = true;
+                        a.workTime = Math.Ceiling(getExponentialRandomVariable(WORK_DELAY));
+                        return;
                     }
-                    else i++;
                 }
+                queue++;
+            }
+
+            public string getStatus()
+            {
+                if (workTime == 0) return $"Agent {id}: client came";
+                return $"Agent {id}: next client arrives in {workTime} minutes";
             }
         }
 
-        public class DoubleRandomFlow : RandomFlow
+        public class ConsumerAgent : Agent
         {
-            int rate1, rate2;
-            public DoubleRandomFlow(int rate1, int rate2) : base(rate1 + rate2) ////
+            public ConsumerAgent(int id) : base(id) 
             {
-                this.rate1 = rate1;
-                this.rate2 = rate2;
-                events = new double[MAX];
-                for (int i = 0; i < MAX; i++)
+                this.hasWork = false;
+            }
+
+            public double getNextEvent()
+            {
+                if (hasWork) return workTime;
+                return 0; ////
+            }
+
+
+            public void processEvent()
+            {
+                hasWork = false;
+                if (queue > 0)
                 {
-                    events[i] = 0;
+                    this.workTime = Math.Ceiling(getExponentialRandomVariable(WORK_DELAY));
+                    this.hasWork = true;
+                    queue--;
+
                 }
             }
 
-            public void Start()
+            public string getStatus()
             {
-                for (int i = 0; i < N; i++)
-                {
-                    int n1 = getNumberOfEvents(rate1);
-                    int n2 = getNumberOfEvents(rate2);
-                    try
-                    {
-                        events[n1 + n2] += 1;
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
-
-                for (int i = 0; i < MAX; i++)
-                {
-                    events[i] /= N;
-                }
+                if (hasWork) return $"Working for {workTime} minutes";
+                else return $"Relax";
             }
         }
 
-        public class RealPuassonFlow : RandomFlow
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            public RealPuassonFlow(int rate) : base(rate)
-            {
-            }
+            timeLabel.Text = "Time: " + T.ToString();
+            inQueueLabel.Text = "In queue: " + queue.ToString();
 
-            public void Start() {
-                for (int m = 0; m < MAX; m++)
+            var minT = double.MaxValue;
+
+            for (int i = 0; i < agents.Count; i++)
+            {
+                try
                 {
-                    double v = getNumberOfEvents(rate, m) % 60;
-                    events[m] = v;
+                    labels[i].Text = agents[i].getStatus();
+                    if (agents[i].hasWork)
+                    {
+                        if (agents[i].workTime == 0)
+                        {
+                            agents[i].processEvent();
+                        }
+                        if (agents[i].getNextEvent() < minT)
+                        {
+                            minT = agents[i].workTime;
+                        }
+                    }
+                }
+                catch
+                {
+
                 }
             }
 
-            public double getNumberOfEvents(int rate, int i) {
-                return Math.Pow(rate * T, i) / factorial(i) * Math.Pow(Math.E, -rate * T);
-            }
-        }
+            eventTimeLabel.Text = $"Next event in: {minT}";
 
-
-        private void startButton_Click(object sender, EventArgs e)
-        {
-            try
+            foreach (var a in agents)
             {
-                T = int.Parse(tTextBox.Text);
-                N = int.Parse(nTextBox.Text);
-                MAX = T * 8 * 2;
-            }
-            catch
-            {
-                return;
+                if (a.hasWork)
+                {
+                    a.workTime -= minT;
+                }
             }
 
-            var r1 = 3;
-            var r2 = 5;
-
-            var flow1 = new RandomFlow(r1);
-            var flow2 = new RandomFlow(r2);
-            var realFlow = new RealPuassonFlow(r1 + r2);
-            var doubleFlow = new DoubleRandomFlow(r1, r2);
-
-            flow1.start();
-            flow2.start();
-            realFlow.Start();
-            doubleFlow.Start();
-
-            chart1.Series[0].Points.DataBindY(flow1.events);
-            chart2.Series[0].Points.DataBindY(flow2.events);
-            chart3.Series[0].Points.DataBindY(doubleFlow.events);
-            chart4.Series[0].Points.DataBindY(realFlow.events);
+            T += minT;
         }
     }
 }
