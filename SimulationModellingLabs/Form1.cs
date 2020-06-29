@@ -1,13 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SimulationModellingLabs
@@ -20,117 +11,160 @@ namespace SimulationModellingLabs
             InitializeComponent();
         }
 
-        Random rnd = new Random();
+        public static double factorial(int num)
+        {
+            var rval = 1;
+            for (var i = 2; i <= num; i++)
+                rval = rval * i;
+            return rval;
+        }
 
-        double[] finalProbs = new double[] { 56.0 / 240.0, 124.0 / 240.0, 60.0 / 240.0 };
-        int weatherState = 0;
-        double N = 0;
+        public static Random random = new Random();
 
-        int time = 0;
-        int changeTime = 2;
-        bool paused = true;
-        double[,] matrix = new double[,] { 
-            { -0.4,  0.3,  0.1 },
-            { 0.4, -0.8,  0.4 },
-            { 0.1,  0.4, -0.5 } 
-        };
+        public static int T;
+        public static int N;
+        public static int MAX;
 
-        //0 - clear, 1 - cloudy, 2 - rain
-        double[] weatherProbabilities = new double[] { 0, 0, 0 };
+        public class RandomFlow
+        {
+            public int rate;
+            public double[] events;
+            public RandomFlow(int rate)
+            {
+                this.rate = rate;
+                events = new double[MAX];
+                for (int i = 0; i < MAX; i++)
+                { 
+                    events[i] = 0; 
+                }
+            }
+
+            public void start()
+            {
+                for (int i = 0; i < N; i++)
+                {
+                    int n = getNumberOfEvents(rate);
+                    try
+                    {
+                        events[n] += 1;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
+                for (int i = 0; i < MAX; i++)
+                {
+                    events[i] /= N;
+                }
+            }
+
+            public int getNumberOfEvents(int rate)
+            {
+                int i = 0;
+                double acc = 0;
+                double P = random.NextDouble();
+                while (true)
+                {
+                    double prob = (Math.Pow(rate * T, i) / factorial(i)) * Math.Pow(Math.E, -rate * T);
+                    acc += prob;
+                    if (P < acc)
+                    {
+                        return i;
+                    }
+                    else i++;
+                }
+            }
+        }
+
+        public class DoubleRandomFlow : RandomFlow
+        {
+            int rate1, rate2;
+            public DoubleRandomFlow(int rate1, int rate2) : base(rate1 + rate2) ////
+            {
+                this.rate1 = rate1;
+                this.rate2 = rate2;
+                events = new double[MAX];
+                for (int i = 0; i < MAX; i++)
+                {
+                    events[i] = 0;
+                }
+            }
+
+            public void Start()
+            {
+                for (int i = 0; i < N; i++)
+                {
+                    int n1 = getNumberOfEvents(rate1);
+                    int n2 = getNumberOfEvents(rate2);
+                    try
+                    {
+                        events[n1 + n2] += 1;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
+                for (int i = 0; i < MAX; i++)
+                {
+                    events[i] /= N;
+                }
+            }
+        }
+
+        public class RealPuassonFlow : RandomFlow
+        {
+            public RealPuassonFlow(int rate) : base(rate)
+            {
+            }
+
+            public void Start() {
+                for (int m = 0; m < MAX; m++)
+                {
+                    double v = getNumberOfEvents(rate, m) % 60;
+                    events[m] = v;
+                }
+            }
+
+            public double getNumberOfEvents(int rate, int i) {
+                return Math.Pow(rate * T, i) / factorial(i) * Math.Pow(Math.E, -rate * T);
+            }
+        }
+
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            if (!paused) return;
-
-            paused = false;
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (!paused)
+            try
             {
-                updateTime();
-
-                if (time > changeTime)
-                {
-                    increaseChangeTime();
-                    updateState();
-                    updatePicture();
-                    updateProbs();
-                    updateChart();
-                }
+                T = int.Parse(tTextBox.Text);
+                N = int.Parse(nTextBox.Text);
+                MAX = T * 8 * 2;
             }
-        }
-
-        private void updateChart()
-        {
-            chart1.Series["Probability"].Points.Clear();
-            chart1.Series["Final"].Points.Clear();
-
-            for (int i = 0; i < weatherProbabilities.Count(); i++)
+            catch
             {
-                chart1.Series["Probability"].Points.AddXY(i + 1, weatherProbabilities[i] / N);
-                chart1.Series["Final"].Points.AddXY(i + 1, finalProbs[i]);
+                return;
             }
-        }
 
-        private void updateProbs()
-        {
-            weatherProbabilities[weatherState]++;
-            N++;
-        }
+            var r1 = 3;
+            var r2 = 5;
 
-        private void updatePicture()
-        {
-            switch (weatherState)
-            {
-                case 0:
-                    weatherPictureBox.Image = Properties.Resources.clear;
-                    break;
-                case 1:
-                    weatherPictureBox.Image = Properties.Resources.cloudy;
-                    break;
-                case 2:
-                    weatherPictureBox.Image = Properties.Resources.rain;
-                    break;
-            }
-        }
+            var flow1 = new RandomFlow(r1);
+            var flow2 = new RandomFlow(r2);
+            var realFlow = new RealPuassonFlow(r1 + r2);
+            var doubleFlow = new DoubleRandomFlow(r1, r2);
 
-        private void updateState()
-        {
-            var r = rnd.NextDouble();
-            double acc = 0;
+            flow1.start();
+            flow2.start();
+            realFlow.Start();
+            doubleFlow.Start();
 
-            for (int i = 0; i < 3; i++)
-            {
-                if (i != weatherState)
-                {
-                    var v = -matrix[weatherState, i] / matrix[weatherState, weatherState];
-                    acc += v;
-                    if (acc > r)
-                    {
-                        weatherState = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void increaseChangeTime()
-        {
-            var t = Math.Log(rnd.NextDouble()) / matrix[weatherState, weatherState];
-            changeTime += (int)Math.Ceiling(t);
-        }
-
-        private void updateTime()
-        {
-            time++;
-            timeLabel.Text = $"{time % 24}:00";
-        }
-
-        private void stopButton_Click(object sender, EventArgs e)
-        {
-            paused = true;
+            chart1.Series[0].Points.DataBindY(flow1.events);
+            chart2.Series[0].Points.DataBindY(flow2.events);
+            chart3.Series[0].Points.DataBindY(doubleFlow.events);
+            chart4.Series[0].Points.DataBindY(realFlow.events);
         }
     }
 }
